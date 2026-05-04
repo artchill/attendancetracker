@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Admin - Attendance{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-800 mb-6">All Employee Attendance</h1>
+<div class="bg-white rounded-lg shadow p-6">
+    {% if records %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700">
+                <tr>
+                    <th class="px-3 py-2 text-left">Employee</th>
+                    <th class="px-3 py-2 text-left">Username</th>
+                    <th class="px-3 py-2 text-left">Day</th>
+                    <th class="px-3 py-2 text-left">Time In</th>
+                    <th class="px-3 py-2 text-left">Time Out</th>
+                    <th class="px-3 py-2 text-left">Hours</th>
+                    <th class="px-3 py-2 text-left">Task Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att, user in records %}
+                <tr class="border-t">
+                    <td class="px-3 py-2">{{ user.fname }} {{ user.lname }}</td>
+                    <td class="px-3 py-2">{{ user.username }}</td>
+                    <td class="px-3 py-2">{{ att.day }}</td>
+                    <td class="px-3 py-2">{{ att.datetime_in.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-3 py-2">
+                        {% if att.datetime_out %}{{ att.datetime_out.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}<span class="text-blue-600">In progress</span>{% endif %}
+                    </td>
+                    <td class="px-3 py-2">{{ att.total_hours if att.total_hours is not none else '-' }}</td>
+                    <td class="px-3 py-2 max-w-md">{{ att.task_report or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500">No attendance records yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

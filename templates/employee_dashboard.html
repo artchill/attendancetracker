@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Employee Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-800 mb-6">Welcome, {{ current_user.fname }}!</h1>
+
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4">Attendance Control</h2>
+
+    {% if open_session %}
+        <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+            <strong>Active session</strong> started at
+            {{ open_session.datetime_in.strftime('%Y-%m-%d %H:%M:%S') }}
+            ({{ open_session.day }})
+        </div>
+
+        <form method="POST" action="{{ url_for('time_out') }}"
+              onsubmit="return confirm('Submit task report and time out?');">
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+                Tasks / Work Done <span class="text-red-600">*</span>
+            </label>
+            <textarea name="task_report" rows="4" required
+                      placeholder="Describe what you accomplished today..."
+                      class="w-full border border-slate-300 rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+            <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-medium">
+                Time Out
+            </button>
+        </form>
+    {% else %}
+        <p class="text-sm text-slate-600 mb-3">You are not currently clocked in.</p>
+        <form method="POST" action="{{ url_for('time_in') }}">
+            <button type="submit"
+                    class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded font-medium">
+                Time In
+            </button>
+        </form>
+    {% endif %}
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-lg font-semibold mb-4">My Attendance History</h2>
+    {% if history %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700">
+                <tr>
+                    <th class="px-3 py-2 text-left">Day</th>
+                    <th class="px-3 py-2 text-left">Time In</th>
+                    <th class="px-3 py-2 text-left">Time Out</th>
+                    <th class="px-3 py-2 text-left">Hours</th>
+                    <th class="px-3 py-2 text-left">Task Report</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in history %}
+                <tr class="border-t">
+                    <td class="px-3 py-2">{{ r.day }}</td>
+                    <td class="px-3 py-2">{{ r.datetime_in.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-3 py-2">
+                        {% if r.datetime_out %}{{ r.datetime_out.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}<span class="text-blue-600">In progress</span>{% endif %}
+                    </td>
+                    <td class="px-3 py-2">{{ r.total_hours if r.total_hours is not none else '-' }}</td>
+                    <td class="px-3 py-2 max-w-md">{{ r.task_report or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500">No attendance records yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
