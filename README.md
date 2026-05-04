@@ -25,7 +25,7 @@ A role-based attendance tracking web application built with Flask. Supports two 
 
 ## Project Structure
 
-​```
+```
 attendance_tracker/
 ├── app.py                  # Flask app, routes, role guards
 ├── models.py               # SQLAlchemy models
@@ -39,7 +39,7 @@ attendance_tracker/
     ├── employee_dashboard.html
     ├── admin_dashboard.html
     └── admin_employees.html
-​```
+```
 
 ## Getting Started
 
@@ -50,13 +50,13 @@ attendance_tracker/
 ### Installation
 
 1. **Clone the repository**
-   ​```bash
+   ```bash
    git clone https://github.com/YOUR_USERNAME/attendance-tracker.git
    cd attendance-tracker
-   ​```
+   ```
 
 2. **Create a virtual environment**
-   ​```bash
+   ```bash
    # macOS / Linux
    python3 -m venv venv
    source venv/bin/activate
@@ -64,22 +64,22 @@ attendance_tracker/
    # Windows (PowerShell)
    python -m venv venv
    venv\Scripts\Activate.ps1
-   ​```
+   ```
 
 3. **Install dependencies**
-   ​```bash
+   ```bash
    pip install -r requirements.txt
-   ​```
+   ```
 
 4. **Seed the database**
-   ​```bash
+   ```bash
    python seed.py
-   ​```
+   ```
 
 5. **Run the app**
-   ​```bash
+   ```bash
    python app.py
-   ​```
+   ```
 
 6. **Open your browser** to [http://localhost:5000](http://localhost:5000)
 
