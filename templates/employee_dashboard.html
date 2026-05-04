@@ -9,7 +9,8 @@
     {% if open_session %}
         <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
             <strong>Active session</strong> started at
-            {{ open_session.datetime_in.strftime('%Y-%m-%d %H:%M:%S') }}
+            {{ open_session.datetime_in.strftime('%-I:%M%p') }} on
+            {{ open_session.datetime_in.strftime('%B %-d, %Y') }}
             ({{ open_session.day }})
         </div>
 
@@ -44,6 +45,7 @@
         <table class="min-w-full text-sm">
             <thead class="bg-slate-100 text-slate-700">
                 <tr>
+                    <th class="px-3 py-2 text-left">Date</th>
                     <th class="px-3 py-2 text-left">Day</th>
                     <th class="px-3 py-2 text-left">Time In</th>
                     <th class="px-3 py-2 text-left">Time Out</th>
@@ -54,10 +56,11 @@
             <tbody>
                 {% for r in history %}
                 <tr class="border-t">
+                    <td class="px-3 py-2">{{ r.datetime_in.strftime('%B %-d, %Y') }}</td>
                     <td class="px-3 py-2">{{ r.day }}</td>
-                    <td class="px-3 py-2">{{ r.datetime_in.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-3 py-2">{{ r.datetime_in.strftime('%-I:%M%p') }}</td>
                     <td class="px-3 py-2">
-                        {% if r.datetime_out %}{{ r.datetime_out.strftime('%Y-%m-%d %H:%M') }}
+                        {% if r.datetime_out %}{{ r.datetime_out.strftime('%-I:%M%p') }}
                         {% else %}<span class="text-blue-600">In progress</span>{% endif %}
                     </td>
                     <td class="px-3 py-2">{{ r.total_hours if r.total_hours is not none else '-' }}</td>

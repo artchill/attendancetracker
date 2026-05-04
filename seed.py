@@ -14,21 +14,21 @@ def seed():
         users = [
             User(
                 username='admin',
-                password_hash=generate_password_hash('admin123'),
+                password_hash=generate_password_hash('admin123', method='pbkdf2:sha256'),
                 fname='System',
                 lname='Administrator',
                 role='admin',
             ),
             User(
                 username='jdoe',
-                password_hash=generate_password_hash('employee123'),
+                password_hash=generate_password_hash('employee123', method='pbkdf2:sha256'),
                 fname='John',
                 lname='Doe',
                 role='employee',
             ),
             User(
                 username='asmith',
-                password_hash=generate_password_hash('employee123'),
+                password_hash=generate_password_hash('employee123', method='pbkdf2:sha256'),
                 fname='Alice',
                 lname='Smith',
                 role='employee',

@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Admin - Employees{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold text-slate-800 mb-6">Registered Employees</h1>
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Registered Employees</h1>
+    <a href="{{ url_for('admin_new_employee') }}"
+       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium text-sm">
+        + Add Employee
+    </a>
+</div>
 <div class="bg-white rounded-lg shadow p-6">
     {% if employees %}
     <div class="overflow-x-auto">

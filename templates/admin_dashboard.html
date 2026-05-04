@@ -10,26 +10,38 @@
                 <tr>
                     <th class="px-3 py-2 text-left">Employee</th>
                     <th class="px-3 py-2 text-left">Username</th>
+                    <th class="px-3 py-2 text-left">Date</th>
                     <th class="px-3 py-2 text-left">Day</th>
                     <th class="px-3 py-2 text-left">Time In</th>
                     <th class="px-3 py-2 text-left">Time Out</th>
                     <th class="px-3 py-2 text-left">Hours</th>
                     <th class="px-3 py-2 text-left">Task Report</th>
-                </tr>
+                    <th class="px-3 py-2 text-left">Actions</th>
+                    </tr>
             </thead>
             <tbody>
                 {% for att, user in records %}
                 <tr class="border-t">
                     <td class="px-3 py-2">{{ user.fname }} {{ user.lname }}</td>
                     <td class="px-3 py-2">{{ user.username }}</td>
+                    <td class="px-3 py-2">{{ att.datetime_in.strftime('%B %-d, %Y') }}</td>
                     <td class="px-3 py-2">{{ att.day }}</td>
-                    <td class="px-3 py-2">{{ att.datetime_in.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-3 py-2">{{ att.datetime_in.strftime('%-I:%M%p') }}</td>
                     <td class="px-3 py-2">
-                        {% if att.datetime_out %}{{ att.datetime_out.strftime('%Y-%m-%d %H:%M') }}
+                        {% if att.datetime_out %}{{ att.datetime_out.strftime('%-I:%M%p') }}
                         {% else %}<span class="text-blue-600">In progress</span>{% endif %}
                     </td>
                     <td class="px-3 py-2">{{ att.total_hours if att.total_hours is not none else '-' }}</td>
-                    <td class="px-3 py-2 max-w-md">{{ att.task_report or '-' }}</td>
+                    <td class="px-3 py-2 max-w-md">
+                    {{ att.task_report or '-' }}
+                    {% if att.edited_at %}
+                        <span class="ml-1 text-xs text-amber-600" title="Edited on {{ att.edited_at.strftime('%B %-d, %Y') }}">✏️</span>
+                    {% endif %}
+                </td>
+                <td class="px-3 py-2">
+                    <a href="{{ url_for('admin_edit_attendance', record_id=att.id) }}"
+                    class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
+                </td>
                 </tr>
                 {% endfor %}
             </tbody>

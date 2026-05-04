@@ -15,7 +15,13 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False)  # 'admin' or 'employee'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    attendances = db.relationship('Attendance', backref='user', lazy=True)
+    # Tell SQLAlchemy explicitly: "attendances" uses Attendance.user_id
+    attendances = db.relationship(
+        'Attendance',
+        foreign_keys='Attendance.user_id',
+        backref='user',
+        lazy=True,
+    )
 
 
 class Attendance(db.Model):
@@ -24,6 +30,11 @@ class Attendance(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     datetime_in = db.Column(db.DateTime, nullable=False)
     datetime_out = db.Column(db.DateTime, nullable=True)
-    day = db.Column(db.String(20), nullable=False)        # auto-filled (e.g., 'Monday')
-    total_hours = db.Column(db.Float, nullable=True)      # auto-calculated on time-out
-    task_report = db.Column(db.Text, nullable=True)       # required on time-out
+    day = db.Column(db.String(20), nullable=False)
+    total_hours = db.Column(db.Float, nullable=True)
+    task_report = db.Column(db.Text, nullable=True)
+    edited_at = db.Column(db.DateTime, nullable=True)
+    edited_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    # The admin who last edited this record (separate FK)
+    edited_by = db.relationship('User', foreign_keys=[edited_by_id])

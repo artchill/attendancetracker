@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Edit Attendance - Admin{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Edit Attendance Record</h1>
+    <a href="{{ url_for('admin_dashboard') }}"
+       class="text-sm text-slate-600 hover:text-slate-800">← Back to Attendance</a>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 max-w-xl">
+    <div class="mb-4 p-3 bg-slate-50 border border-slate-200 rounded text-sm">
+        <p><strong>Employee:</strong> {{ record.user.fname }} {{ record.user.lname }}
+           ({{ record.user.username }})</p>
+        <p><strong>Record ID:</strong> #{{ record.id }}</p>
+        {% if record.edited_at %}
+        <p class="mt-2 text-amber-700">
+            ⚠️ Last edited on
+            {{ record.edited_at.strftime('%B %-d, %Y at %-I:%M%p') }}
+            {% if record.edited_by %}
+                by {{ record.edited_by.fname }} {{ record.edited_by.lname }}
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+
+    <form method="POST" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+                Date <span class="text-red-600">*</span>
+            </label>
+            <input type="date" name="date" required
+                   value="{{ record.datetime_in.strftime('%Y-%m-%d') }}"
+                   class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <p class="text-xs text-slate-500 mt-1">
+                The day of the week will be auto-updated based on this date.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Time In <span class="text-red-600">*</span>
+                </label>
+                <input type="time" name="time_in" required
+                       value="{{ record.datetime_in.strftime('%H:%M') }}"
+                       class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Time Out
+                </label>
+                <input type="time" name="time_out"
+                       value="{{ record.datetime_out.strftime('%H:%M') if record.datetime_out else '' }}"
+                       class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <p class="text-xs text-slate-500 mt-1">
+                    Leave empty to mark as in-progress.
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+                Task Report
+            </label>
+            <textarea name="task_report" rows="4"
+                      placeholder="Tasks completed during this session..."
+                      class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">{{ record.task_report or '' }}</textarea>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded p-3 text-sm">
+            <strong>Current total hours:</strong>
+            {{ record.total_hours if record.total_hours is not none else 'In progress' }}
+            <p class="text-xs text-slate-600 mt-1">
+                Total hours will be automatically recalculated when you save.
+            </p>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit"
+                    onclick="return confirm('Save changes to this attendance record?');"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded font-medium">
+                Save Changes
+            </button>
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-2 rounded font-medium">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
