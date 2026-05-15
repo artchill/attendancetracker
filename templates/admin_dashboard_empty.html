@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-12 text-center">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">No Employees Yet</h1>
+    <p class="text-slate-600 mb-6">Add your first employee to start tracking attendance.</p>
+    <a href="{{ url_for('admin_new_employee') }}"
+       class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded font-medium">
+        + Add Employee
+    </a>
+</div>
+{% endblock %}

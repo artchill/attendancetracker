@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Attendance Tracker{% endblock %}</title>
+    <title>{% block title %}AFSI Attendance{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
     {% if current_user.is_authenticated %}
     <nav class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
-        <div class="font-semibold text-lg">Attendance Tracker</div>
+        <div class="font-semibold text-lg">AFSI Attendance Tracker</div>
         <div class="flex items-center gap-4">
             {% if current_user.role == 'admin' %}
-                <a href="{{ url_for('admin_dashboard') }}" class="hover:underline">Attendance</a>
-                <a href="{{ url_for('admin_employees') }}" class="hover:underline">Employees</a>
+                <a href="{{ url_for('admin_dashboard') }}" class="hover:underline">Tracker</a>
+                <a href="{{ url_for('admin_employees') }}" class="hover:underline">Manage Users</a>
             {% endif %}
             <span class="text-sm text-slate-300">
                 {{ current_user.fname }} {{ current_user.lname }} ({{ current_user.role }})

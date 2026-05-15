@@ -1,0 +1,119 @@
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm">
+    <thead class="bg-slate-100 text-slate-700">
+        <tr>
+            <th class="px-3 py-2 text-left">Date</th>
+            <th class="px-3 py-2 text-left">Day</th>
+            <th class="px-3 py-2 text-left">Status</th>
+            <th class="px-3 py-2 text-left">Time In</th>
+            <th class="px-3 py-2 text-left">Time Out</th>
+            <th class="px-3 py-2 text-left">Hours</th>
+            <th class="px-3 py-2 text-left">Task / Note</th>
+            <th class="px-3 py-2 text-left">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for day in calendar %}
+        {% set row_class = '' %}
+        {% if day.status == 'absent' %}{% set row_class = 'bg-red-50' %}{% endif %}
+        {% if day.status == 'no_work' %}{% set row_class = 'bg-slate-50' %}{% endif %}
+        {% if day.status == 'vl' %}{% set row_class = 'bg-purple-50' %}{% endif %}
+        {% if day.status == 'sl' %}{% set row_class = 'bg-amber-50' %}{% endif %}
+        {% if day.status == 'future' %}{% set row_class = 'bg-white text-slate-400' %}{% endif %}
+        <tr class="border-t {{ row_class }}">
+            <td class="px-3 py-2">{{ day.date.strftime('%B %-d, %Y') }}</td>
+            <td class="px-3 py-2">{{ day.day_name }}</td>
+            <td class="px-3 py-2">
+                {% if day.status == 'present' %}
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Present</span>
+                {% elif day.status == 'absent' %}
+                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">Absent</span>
+                {% elif day.status == 'vl' %}
+                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded">VL</span>
+                {% elif day.status == 'sl' %}
+                    <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded">SL</span>
+                {% elif day.status == 'no_work' %}
+                    <span class="bg-slate-200 text-slate-700 text-xs font-medium px-2 py-1 rounded">No Work</span>
+                {% else %}
+                    <span class="text-xs text-slate-400">—</span>
+                {% endif %}
+            </td>
+            <td class="px-3 py-2">
+                {% for a in day.attendances %}
+                    {{ a.datetime_in.strftime('%-I:%M%p') }}{% if not loop.last %}<br>{% endif %}
+                {% else %}—{% endfor %}
+            </td>
+            <td class="px-3 py-2">
+                {% for a in day.attendances %}
+                    {% if a.datetime_out %}{{ a.datetime_out.strftime('%-I:%M%p') }}
+                    {% else %}<span class="text-blue-600 text-xs">In progress</span>{% endif %}
+                    {% if not loop.last %}<br>{% endif %}
+                {% else %}—{% endfor %}
+            </td>
+            <td class="px-3 py-2">
+                {% set completed = day.attendances | selectattr('total_hours') | list %}
+                {% if completed %}
+                    {{ '%.2f'|format(completed | sum(attribute='total_hours')) }}
+                {% elif day.attendances %}
+                    <span class="text-blue-600 text-xs">In progress</span>
+                {% else %}—{% endif %}
+            </td>
+            <td class="px-3 py-2 max-w-xs">
+                {% for a in day.attendances %}
+                    <div class="text-xs">
+                        {{ a.task_report or '—' }}
+                        {% if a.edited_at %}<span class="text-amber-600" title="Edited">✏️</span>{% endif %}
+                    </div>
+                {% endfor %}
+                {% if day.leave and day.leave.note %}
+                    <div class="text-xs italic text-slate-600">{{ day.leave.note }}</div>
+                {% endif %}
+            </td>
+            <td class="px-3 py-2 text-xs">
+                {% if day.status == 'present' and current_user.role == 'admin' %}
+                    {% for a in day.attendances %}
+                        <a href="{{ url_for('admin_edit_attendance', record_id=a.id) }}"
+                           class="text-blue-600 hover:text-blue-800">Edit</a>{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                {% elif day.status in ('vl', 'sl') and not day.is_future %}
+                    <form method="POST" action="{{ url_for('delete_leave', leave_id=day.leave.id) }}" class="inline"
+                          onsubmit="return confirm('Remove this {{ day.status|upper }} entry?');">
+                        <input type="hidden" name="redirect_to" value="{{ redirect_to or 'employee_dashboard' }}">
+                        {% if redirect_to == 'admin_employee_tracker' %}
+                            <input type="hidden" name="year" value="{{ year }}">
+                            <input type="hidden" name="month" value="{{ month }}">
+                        {% endif %}
+                        <button type="submit" class="text-red-600 hover:text-red-800">Remove</button>
+                    </form>
+                {% elif day.status in ('absent', 'no_work') and not day.is_future %}
+                    <form method="POST" action="{{ url_for('mark_leave') }}" class="flex gap-1 items-center">
+                        <input type="hidden" name="user_id" value="{{ employee.id if employee else current_user.id }}">
+                        <input type="hidden" name="date" value="{{ day.date.strftime('%Y-%m-%d') }}">
+                        <input type="hidden" name="redirect_to" value="{{ redirect_to or 'employee_dashboard' }}">
+                        {% if redirect_to == 'admin_employee_tracker' %}
+                            <input type="hidden" name="year" value="{{ year }}">
+                            <input type="hidden" name="month" value="{{ month }}">
+                        {% endif %}
+                        <button type="submit" name="leave_type" value="VL"
+                                class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-2 py-1 rounded">VL</button>
+                        <button type="submit" name="leave_type" value="SL"
+                                class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-2 py-1 rounded">SL</button>
+                    </form>
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- Legend -->
+<div class="mt-4 flex flex-wrap gap-3 text-xs text-slate-600">
+    <span><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded">Present</span> = Timed in</span>
+    <span><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded">Absent</span> = Weekday, no time in</span>
+    <span><span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">VL</span> = Vacation Leave</span>
+    <span><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded">SL</span> = Sick Leave</span>
+    <span><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded">No Work</span> = Weekend, no time in</span>
+</div>
